@@ -7,7 +7,7 @@ public class Space {
     private final int COL;
     private final int ROW;
     private final int NUMBER;
-    private final int nByN;
+    private final int gridMeasurement;
     private int tile;
 
 	/**
@@ -21,7 +21,7 @@ public class Space {
         	throw new RuntimeException("Space is not within bounds of the board");
         } else {
         	this.NUMBER = number;
-        	this.nByN = this.bounds() / 4;
+        	this.gridMeasurement = (int) Math.sqrt(this.bounds());
         	this.COL = col;
         	this.ROW = row;
         	this.tile = tileNumber;
@@ -103,7 +103,7 @@ public class Space {
             return false;
         }
         Space otherSpace = (Space) obj;
-        return (this.number() == otherSpace.number() && this.bounds() == otherSpace.bounds() && this.col() == otherSpace.col() && this.row() == otherSpace.row());
+        return (this.number() == otherSpace.number() && this.bounds() == otherSpace.bounds() && this.col() == otherSpace.col() && this.row() == otherSpace.row() && this.getTile() == otherSpace.getTile());
     }
     
     @Override

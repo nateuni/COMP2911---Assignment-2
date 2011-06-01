@@ -28,7 +28,6 @@ public class Board implements SlidingBlock {
 	
 	public Board(int n){
 		if(n < 4) throw new RuntimeException("Minimum of 4 spaces on a board");
-		if(n % 2 != 0) throw new RuntimeException("Board size needs to be an even number");
 		this.size = n;
 		this.gridMeasurement = (int) Math.sqrt(this.size);
 	}
@@ -36,14 +35,9 @@ public class Board implements SlidingBlock {
 
 	@Override
 	public int[] solve(int[] start, int[] goal, int maxMoves) {
-		int i = 0;
-		if(start.length > size || goal.length > size) throw new RuntimeException("Invalid start and goal array sizes");
+		if(start.length != size && goal.length != size) throw new RuntimeException("Board size is inconsistentg with start and goal array sizes");
 		this.startSpaceArray = layoutSpaces(start);
 		this.goalSpaceArray = layoutSpaces(goal);
-		while(i < this.startSpaceArray.length) {
-			System.out.println(startSpaceArray[i].toString());
-			i++;
-		}
 		return start;
 	}
 	@Override
@@ -68,6 +62,10 @@ public class Board implements SlidingBlock {
 		return temp;
 	}
 	
+	public Space[] getSpaceArray(){
+		return this.startSpaceArray;
+	}
+	
 	/**
 	 * Tests if game has been won.
 	 * @return 1 is game is won by player 1, 2 if won by player 2, 0 otherwise
@@ -75,6 +73,14 @@ public class Board implements SlidingBlock {
 	
 	public int checkWin() {
 		return 0;
+	}
+	
+	public int size(){
+		return this.size;
+	}
+	
+	public int gridSize(){
+		return this.gridMeasurement;
 	}
 	
 	/**
@@ -160,7 +166,7 @@ public class Board implements SlidingBlock {
 	 * for printing purposes
 	 */
 	public String toString() {
-		return "dude";// BoardPrinter.buildBoardString(this);
+		return BoardPrinter.buildBoardString(this);
 	}
 
 	/**
