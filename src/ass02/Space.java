@@ -1,5 +1,7 @@
 package ass02;
 
+import Position;
+
 public class Space {
 	
 	private static int OUTER_BOUNDS;
@@ -115,7 +117,15 @@ public class Space {
      * Checks the space is within the bounds of the board
      * @return The result.
      */
- boolean withinBounds(int number) {
-        return (number >= INNER_BOUNDS && number < OUTER_BOUNDS);
+    boolean withinBounds(int number) {
+    	return (number >= INNER_BOUNDS && number < OUTER_BOUNDS);
     }
+
+    public boolean isAdjacent(Object obj) {
+    	if(!(obj instanceof Space)) {
+    		return false;
+    	}
+    	Space pos = (Space) obj;
+    	return (Math.abs(this.row() - pos.row()) == 1 && Math.abs(this.col() - pos.col()) == 0 || Math.abs(this.row() - pos.row()) == 0 && Math.abs(this.col() - pos.col()) == 1);
+	}
 }

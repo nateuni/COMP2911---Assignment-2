@@ -8,8 +8,6 @@ public class Node {
 	private int g;
 	private int h;
 	private Space space = null;
-
-	
 	
 	public Node getParent() {
 		return parent;
