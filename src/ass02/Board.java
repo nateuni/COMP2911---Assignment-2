@@ -9,7 +9,8 @@ import java.util.LinkedList;
  */
 public class Board extends BoardComponent implements SlidingBlock {
 
-
+	final boolean VERTICAL = true;
+	final boolean HORIZONTAL = false;
 	protected LinkedList<Wall> wallList = new LinkedList<Wall>();
 	//protected LinkedList<Move> moveList = new LinkedList<Move>();
 	protected int moveListIndex = -1;
@@ -20,15 +21,14 @@ public class Board extends BoardComponent implements SlidingBlock {
 	//private Space start;
 	//private Space goal;
 	//private int maxMoves;
-	private Space[] startSpaceArray;
-	private Space[] goalSpaceArray;
+	private Space[] boardSpaceArray;
 	
 	
 	public Board(int numberOfSquares){
 		if(numberOfSquares < 4) throw new RuntimeException("Minimum of 4 spaces on a board");
 		// How to test for perfect square?
-		long tst = (long)(Math.sqrt(numberOfSquares) + 0.5);
-		if(!(tst*tst == numberOfSquares)) throw new RuntimeException("Not correct dimensions for a perfectly square board");;
+		long check = (long)(Math.sqrt(numberOfSquares) + 0.5);
+		if(!(check*check == numberOfSquares)) throw new RuntimeException("Not correct dimensions for a perfectly square board");;
 		n = numberOfSquares;
 		gridMeasurement = (int) Math.sqrt(n);
 	}
@@ -37,9 +37,8 @@ public class Board extends BoardComponent implements SlidingBlock {
 	@Override
 	public int[] solve(int[] start, int[] goal, int maxMoves) {
 		if(start.length != n && goal.length != n) throw new RuntimeException("Board size is inconsistentg with start and goal array sizes");
-		this.startSpaceArray = layoutSpaces(start);
-		this.goalSpaceArray = layoutSpaces(goal);
-		BoardGraph graph = new BoardGraph(goalSpaceArray);
+		this.boardSpaceArray = layoutSpaces(start);
+		BoardGraph graph = new BoardGraph(boardSpaceArray);
 		graph.fillNodeDistances(new Space(5,1,1));
 		graph.printDistanceFills();
 		
@@ -52,7 +51,53 @@ public class Board extends BoardComponent implements SlidingBlock {
 	}
 	@Override
 	public void addWall(int positionI, int positionJ) {
+		Space spaceI = findCorrespondingBoardSpace(positionI);
+		Space spaceJ = findCorrespondingBoardSpace(positionJ);	
+		Wall wall = null;
 		
+		if(spaceI == null && spaceJ == null){
+			System.out.println("Cannot Add Wall with Null Spaces");
+		} else{
+			if(spaceI.isAdjacent(spaceJ)){
+				if(spaceI == spaceJ.getUp()){
+					wall = new Wall(spaceI, HORIZONTAL);
+				} else if(spaceI == spaceJ.getDown()){
+					wall = new Wall(spaceJ,HORIZONTAL);
+				} else if(spaceI == spaceJ.getLeft()){
+					wall = new Wall(spaceI,VERTICAL);
+				} else if(spaceI == spaceJ.getRight()) {
+					wall = new Wall(spaceJ,VERTICAL);
+				}
+			}
+			
+			if(wall == null){
+				System.out.println("Wall cannot be placed between spaces that are not adjacent");
+			} else if(wallList.contains(wall)){
+				System.out.println("Wall already exists.... ignoring request");
+			}else{
+				placeWall(wall);
+			}
+		}
+	}
+	
+	/**
+	 * Returns a pointer to the wall list.
+	 * @return The list of all walls at time of calling
+	 */
+	public LinkedList<Wall> getWallList() {
+		return this.wallList;
+	}
+	
+	public Space findCorrespondingBoardSpace(int position){
+		boolean found = false;
+		Space space = null;
+		for(int i = 0; i < boardSpaceArray.length && !found; i++){
+			if(boardSpaceArray[i].number() == position){
+				space = boardSpaceArray[i];
+				found = true;
+			}
+		}
+		return space;
 	}
 	
 	private Space[] layoutSpaces(int[] layout){
@@ -61,15 +106,15 @@ public class Board extends BoardComponent implements SlidingBlock {
 		for(int x = 0; x < gridMeasurement; x++){
 			for(int y = 0; y < gridMeasurement; y++){
 				temp[spaceIndex] = new Space(spaceIndex, x, y);
-				temp[spaceIndex].setTile(layout[spaceIndex]);
+				temp[spaceIndex].setTile(new Tile(layout[spaceIndex]));
 				spaceIndex++;
 			}
 		}
 		return temp;
 	}
 	
-	public Space[] getSpaceArray(){
-		return this.startSpaceArray;
+	public Space[] getBoardSpaceArray(){
+		return this.boardSpaceArray;
 	}
 	
 	/**
@@ -90,7 +135,7 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 * Checks if a wall exists between two given spaces.
 	 * @param space a, b the spaces that represent the junction being queried
 	 * @return true if a wall exists between these two walls.
-	 
+	 */
 	public boolean wallIsHere(Space a, Space b) {
 		if (!(adjacentSpaces(a, b))) {
 			return false;
@@ -149,10 +194,9 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 * Adds a given wall to the board (assumes valid)
 	 * @param wall the wall that is to be added to the list
 	 */
-	public void addWall(Wall wall) {
+	public void placeWall(Wall wall) {
 		wallList.add(wall);
-		graph = new BoardGraph(this.getSpaceArray());
-			addWall(wall);
+		graph = new BoardGraph(this.getBoardSpaceArray());
 	}
 
 	/**
@@ -165,7 +209,7 @@ public class Board extends BoardComponent implements SlidingBlock {
 
 	/**
 	 * Print the board layout to console
-	 
+	 */
 	public void print() {
 		System.out.println(this);
 	}
@@ -176,18 +220,10 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 * If it is valid, the move is done and added to moveList.
 	 * Otherwise it throws an exception.
 	 * @param move
-	 *
-	public void makeMove(Move move) {
-		if (!moveValid(move)) throw new RuntimeException("Invalid move");
-		if (moveList.size() > 0) {
-			assert (moveListIndex >= 0);
-			while (moveList.size() > moveListIndex + 1)
-				moveList.removeLast();
-		}
-		move.owner = currentPlayer;
-		moveList.add(move);
-		moveListIndex++;
-		applyMove(move);
+	 */
+	public void makeSingleMove(Two<Space> locations) {
+		if (!validMove(locations)) throw new RuntimeException("Invalid move");
+			applyMove(locations);
 	}
 
 	/**
@@ -195,38 +231,10 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 * @param move
 	 * @return True if the move is valid.
 	 * TODO: Make it throw exceptions for invalid moves.
-	 *
-	public boolean moveValid (Move move) {
-		if (move instanceof MovementMove) {
-			MovementMove mMove = (MovementMove) move;
-			if (!wallIsHere(mMove.from(), mMove.to()) 
-					&& mMove.from().equals(currentPlayer.getSpace()) 
-					&& !isOccupied(mMove.to()) 
-					&& (adjacentSpaces(mMove.from(), mMove.to()) || jumpValid(mMove))) {
-				return true;
-			}
-			return false;
-		}	
-		if (move instanceof WallMove) {
-			if(!currentPlayer.hasWallsLeft()) {
-				return false;
-			}
-			WallMove wMove = (WallMove) move;
-			Wall proposedWall = wMove.wall();
-			if (wallList.contains(new Wall(wMove.wall().getSpace(), !wMove.wall().isVertical()))) return false;
-			if (proposedWall.isHorizontal()
-					&&!wallIsHere(proposedWall.getSpace(), proposedWall.getSpace().getDown())
-					&&!wallIsHere(proposedWall.getSpace().getRight(), proposedWall.getSpace().getDown().getRight())) {
-				if (cutsOffPath((WallMove) move)) return false;
-				return true;
-			}
-			else if (!proposedWall.isHorizontal()
-					&&!wallIsHere(proposedWall.getSpace(), proposedWall.getSpace().getRight())
-					&&!wallIsHere(proposedWall.getSpace().getDown(), proposedWall.getSpace().getRight().getDown())) {
-				if (cutsOffPath((WallMove) move)) return false;
-				return true;
-			}
-		}
+	 */
+	public boolean validMove(Two<Space> locations) {
+		if (!wallIsHere(locations._1(), locations._2()) && adjacentSpaces(locations._1(), locations._2()) && (locations._1().tileIsHole() || locations._2().tileIsHole()))
+			return true;
 		return false;
 	}
 
@@ -235,17 +243,12 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 * Assumes that the move is valid.
 	 * Used for new (validated) moves or redo.
 	 * @param move to be played
-	 *
-	private void applyMove(Move move) {
-		if (move instanceof MovementMove) {
-			move.owner.setSpace(((MovementMove) move).to());
-		}
-		if (move instanceof WallMove) {
-			this.addWall(((WallMove) move).wall());
-		}
-		currentPlayer = players.other(currentPlayer);
+	 */
+	private void applyMove(Two<Space> locations) {
+		locations._1().swopTiles(locations._2);
 	}
 
+	/* 
 	@SuppressWarnings("unchecked")
 	public Board clone() {
 		Board cloneBoard = new Board(this.players);

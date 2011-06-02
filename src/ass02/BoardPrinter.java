@@ -54,7 +54,7 @@ public class BoardPrinter {
 			}
 		}
 		
-		/*
+		
 		// Fill array with wall locations
 		for (Wall wall : board.getWallList()) {
 			row = wall.getSpace().row() - 1;
@@ -62,18 +62,18 @@ public class BoardPrinter {
 			if (wall.isVertical()) wallArray[row][col] = 1;
 			else wallArray[row][col] = 2;
 		}
-		*/
+		
 
 		i = 0;
 		for (row = 0; row < board.gridMeasurement(); row++) {
 			// Print row of spaces
-			boardString.append((rowNum+1)+" |");
+			boardString.append((rowNum)+" |");
 			rowNum++;
 			for (col = 0; col < board.gridMeasurement(); col++) {
-				if(board.getSpaceArray()[i].getTile() >= 10){
-					boardString.append(" "+board.getSpaceArray()[i].getTile()+" ");
+				if(board.getBoardSpaceArray()[i].getTile().number() >= 10){
+					boardString.append(" "+board.getBoardSpaceArray()[i].getTile().number()+" ");
 				} else {
-					boardString.append("  "+board.getSpaceArray()[i].getTile()+" ");
+					boardString.append("  "+board.getBoardSpaceArray()[i].getTile().number()+" ");
 				}
 				
 				i++;
@@ -107,7 +107,7 @@ public class BoardPrinter {
 		}
 		boardString.append("   \n    ");
 		for(i = 0; i < board.gridMeasurement(); i++){
-			boardString.append(" "+(i+1)+"   ");
+			boardString.append(" "+(i)+"   ");
 		}		
 		return boardString.toString();
 	}

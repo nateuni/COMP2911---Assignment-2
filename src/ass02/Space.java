@@ -6,7 +6,7 @@ public class Space extends BoardComponent {
     private final int COL;
     private final int ROW;
     private final int NUMBER;
-    private int tile;
+    private Tile tile;
 
 	/**
      * @param COL
@@ -31,62 +31,66 @@ public class Space extends BoardComponent {
     	return this.NUMBER;
     }
     
-    public int getTile(){
+    public Tile getTile(){
     	return tile;
     }
     
-    public void setTile(int tileNumber){
-    	this.tile = tileNumber;
+    public void setTile(Tile newTile){
+    	this.tile = newTile;
     }
     
-    public boolean isHole() {
-		if(this.getTile() == 0) return true;
+    public boolean tileIsHole() {
+		if(this.getTile().isHole()) return true;
 		else return false;
 	}
+    
+    public int bounds(){
+    	return gridMeasurement;
+    }
 
     
 	/*
      * obtain the space above
      * @return space above this object
-     
+     */
     public Space getUp() {
-        if (ROW == 1) {
+        if (ROW == 0) {
             return null;
         }
-        return new Space((COL - nByN), this.bounds(), COL, ROW - 1);
+        return new Space(this.number() - gridMeasurement, this.ROW - 1, this.COL);
     }
 
-    
+    /*
      * obtain the space below
      * @return space below this object
-     
+     */
     public Space getDown() {
         if (ROW == this.bounds()) {
             return null;
         }
-        return new Space((COL - nByN), this.bounds(), COL, ROW + 1);
+        return new Space(this.number() + gridMeasurement, this.ROW + 1, this.COL);
     }
 
     /*
      * obtain the space to the left
      * @return space to left of this object
-     
+     */
     public Space getLeft() {
         if (COL == 0) {
             return null;
         }
-        return new Space((COL - nByN), this.bounds(), COL - 1, ROW);
+        return new Space(this.number() - 1, this.ROW, this.COL - 1);
     }
 
     /*
      * obtain the space to the right
      * @return space to right of this object
-     
+     */
     public Space getRight() {
         if (COL == this.bounds()) {
             return null;
         }
-        return new Space((COL - nByN), this.bounds(), COL + 1, ROW);
+        return new Space(this.number() + 1, this.ROW, this.COL + 1);
     }
     
    
@@ -121,7 +125,17 @@ public class Space extends BoardComponent {
     	if(!(obj instanceof Space)) {
     		return false;
     	}
-    	Space pos = (Space) obj;
-    	return (Math.abs(this.row() - pos.row()) == 1 && Math.abs(this.col() - pos.col()) == 0 || Math.abs(this.row() - pos.row()) == 0 && Math.abs(this.col() - pos.col()) == 1);
+    	Space other = (Space) obj;
+    	return (Math.abs(this.row() - other.row()) == 1 && Math.abs(this.col() - other.col()) == 0 || Math.abs(this.row() - other.row()) == 0 && Math.abs(this.col() - other.col()) == 1);
 	}
+    
+    public boolean swopTiles(Space other){
+    	if(isAdjacent(other) && this.tileIsHole() || other.tileIsHole()){
+    		Tile temp = this.getTile();
+        	this.setTile(other.getTile());
+        	other.setTile(temp);
+        	return true;
+    	}
+    	return false;
+    }
 }
