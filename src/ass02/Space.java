@@ -1,15 +1,11 @@
 package ass02;
 
-import Position;
-
-public class Space {
+public class Space extends BoardComponent {
 	
-	private static int OUTER_BOUNDS;
 	private final int INNER_BOUNDS = 0;
     private final int COL;
     private final int ROW;
     private final int NUMBER;
-    private final int gridMeasurement;
     private int tile;
 
 	/**
@@ -17,27 +13,12 @@ public class Space {
      * @param ROW
      * @exception throws a RuntimeException if the space is out of bounds
      */
-    public Space(int number, int boardSize, int col, int row, int tileNumber) {
-    	OUTER_BOUNDS = boardSize;
-        if(!withinBounds(number)){
-        	throw new RuntimeException("Space is not within bounds of the board");
-        } else {
-        	this.NUMBER = number;
-        	this.gridMeasurement = (int) Math.sqrt(this.bounds());
-        	this.COL = col;
-        	this.ROW = row;
-        	this.tile = tileNumber;
-        }
+    public Space(int number, int row, int col) {
+    	this.COL = col;
+    	this.ROW = row;
+    	this.NUMBER = number;
     }
-    
-    public int number() {
-		return NUMBER;
-	}
-    
-    public int bounds() {
-		return OUTER_BOUNDS;
-	}
-    
+  
     public int row(){
     	return this.ROW;
     }
@@ -46,9 +27,22 @@ public class Space {
     	return this.COL;
     }
     
+    public int number(){
+    	return this.NUMBER;
+    }
+    
     public int getTile(){
     	return tile;
     }
+    
+    public void setTile(int tileNumber){
+    	this.tile = tileNumber;
+    }
+    
+    public boolean isHole() {
+		if(this.getTile() == 0) return true;
+		else return false;
+	}
 
     
 	/*
@@ -94,6 +88,8 @@ public class Space {
         }
         return new Space((COL - nByN), this.bounds(), COL + 1, ROW);
     }
+    
+   
      
 
     /* (non-Javadoc)
@@ -105,7 +101,7 @@ public class Space {
             return false;
         }
         Space otherSpace = (Space) obj;
-        return (this.number() == otherSpace.number() && this.bounds() == otherSpace.bounds() && this.col() == otherSpace.col() && this.row() == otherSpace.row() && this.getTile() == otherSpace.getTile());
+        return (this.col() == otherSpace.col() && this.row() == otherSpace.row() && this.number() == otherSpace.number());
     }
     
     @Override
@@ -118,7 +114,7 @@ public class Space {
      * @return The result.
      */
     boolean withinBounds(int number) {
-    	return (number >= INNER_BOUNDS && number < OUTER_BOUNDS);
+    	return (number >= INNER_BOUNDS && number < this.gridMeasurement());
     }
 
     public boolean isAdjacent(Object obj) {

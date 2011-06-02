@@ -34,11 +34,11 @@ public class BoardPrinter {
 	}
 
 	public static String buildBoardString(Board board) {
-		StringBuilder boardString = new StringBuilder();
+		StringBuilder boardString = new StringBuilder();board.gridMeasurement();
 		int i, row, col, rowNum = 0;
 		
 		boardString.append("   ");
-		for(i = 0; i < board.gridSize(); i++){
+		for(i = 0; i < board.gridMeasurement(); i++){
 			boardString.append("---- ");
 		}
 		boardString.append("\n");
@@ -47,9 +47,9 @@ public class BoardPrinter {
 		String corner = getCorner();
 		
 		// Create array for walls
-		int [][] wallArray = new int [board.size()][board.size()];
-		for (row = 0; row < board.gridSize(); row++) {
-			for (col = 0; col < board.gridSize(); col++) {
+		int [][] wallArray = new int [board.gridMeasurement()][board.gridMeasurement()];
+		for (row = 0; row < board.gridMeasurement(); row++) {
+			for (col = 0; col < board.gridMeasurement(); col++) {
 				wallArray[row][col] = 0;
 			}
 		}
@@ -65,11 +65,11 @@ public class BoardPrinter {
 		*/
 
 		i = 0;
-		for (row = 0; row < board.gridSize(); row++) {
+		for (row = 0; row < board.gridMeasurement(); row++) {
 			// Print row of spaces
 			boardString.append((rowNum+1)+" |");
 			rowNum++;
-			for (col = 0; col < board.gridSize(); col++) {
+			for (col = 0; col < board.gridMeasurement(); col++) {
 				if(board.getSpaceArray()[i].getTile() >= 10){
 					boardString.append(" "+board.getSpaceArray()[i].getTile()+" ");
 				} else {
@@ -77,7 +77,7 @@ public class BoardPrinter {
 				}
 				
 				i++;
-				if (col != board.gridSize() - 1) {
+				if (col != board.gridMeasurement() - 1) {
 					if (wallArray[row][col] == 1 || row != 0 && wallArray[row-1][col] == 1) boardString.append(V_WALL);
 					else boardString.append(V_DIVIDER);
 				}
@@ -85,13 +85,13 @@ public class BoardPrinter {
 			boardString.append(" |\n");
 			
 			// Print divider between rows
-			if (row != board.gridSize() - 1) {
+			if (row != board.gridMeasurement() - 1) {
 				boardString.append("  | ");
-				for (col = 0; col < board.gridSize(); col++) {
+				for (col = 0; col < board.gridMeasurement(); col++) {
 					if (wallArray[row][col] == 2 || col != 0 && wallArray[row][col-1] == 2) boardString.append(H_WALL + H_WALL + H_WALL);
 					else boardString.append(hDivider);
 					
-					if (col != board.gridSize() - 1) {
+					if (col != board.gridMeasurement() - 1) {
 						if (wallArray[row][col] == 1) boardString.append(V_WALL);
 						else if (wallArray[row][col] == 2) boardString.append(H_WALL);
 						else boardString.append(corner);
@@ -102,11 +102,11 @@ public class BoardPrinter {
 		}
 		
 		boardString.append("   ");
-		for(i = 0; i < board.gridSize(); i++){
+		for(i = 0; i < board.gridMeasurement(); i++){
 			boardString.append("---- ");
 		}
 		boardString.append("   \n    ");
-		for(i = 0; i < board.gridSize(); i++){
+		for(i = 0; i < board.gridMeasurement(); i++){
 			boardString.append(" "+(i+1)+"   ");
 		}		
 		return boardString.toString();

@@ -8,9 +8,10 @@ import static org.junit.Assert.*;
 
 public class WallTests {
 	
-	Wall wall1 = new Wall(9, 0, 1);
-	Wall wall2 = new Wall(9, 0, 1);
-	Wall wall3 = new Wall(9, 0, 4);
+	Board board = new Board(9);
+	Wall wall1 = new Wall(new Space(0,0,0), true);
+	Wall wall2 = new Wall(new Space(0,0,0), true);
+	Wall wall3 = new Wall(new Space(1,1,0), true);
 	
 	@Test
 	public void checkWallsForEquality(){
@@ -31,6 +32,6 @@ public class WallTests {
 	
 	@Test
 	(expected=RuntimeException.class) public void cannotMakeOutOfBoundsWall(){
-		new Wall(9, 0, 9);
+		new Wall(new Space(9,9,0), true);
 	}
 }

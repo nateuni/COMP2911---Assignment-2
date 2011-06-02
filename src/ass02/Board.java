@@ -7,18 +7,16 @@ import java.util.LinkedList;
  * A board has Two Players and up to 20 placed walls (10 per player) and tracks each of their coordinates.
  * @author Team Stump
  */
-public class Board implements SlidingBlock {
+public class Board extends BoardComponent implements SlidingBlock {
 
 
 	protected LinkedList<Wall> wallList = new LinkedList<Wall>();
-	/*
-	protected LinkedList<Move> moveList = new LinkedList<Move>();
+	//protected LinkedList<Move> moveList = new LinkedList<Move>();
 	protected int moveListIndex = -1;
-	public BoardGraph graph = new BoardGraph();
-	*/
+	public BoardGraph graph;
 	
-	private final int size;
-	private final int gridMeasurement;
+	//private final int size;
+	//private final int gridMeasurement;
 	//private Space start;
 	//private Space goal;
 	//private int maxMoves;
@@ -26,18 +24,25 @@ public class Board implements SlidingBlock {
 	private Space[] goalSpaceArray;
 	
 	
-	public Board(int n){
-		if(n < 4) throw new RuntimeException("Minimum of 4 spaces on a board");
-		this.size = n;
-		this.gridMeasurement = (int) Math.sqrt(this.size);
+	public Board(int numberOfSquares){
+		if(numberOfSquares < 4) throw new RuntimeException("Minimum of 4 spaces on a board");
+		// How to test for perfect square?
+		long tst = (long)(Math.sqrt(numberOfSquares) + 0.5);
+		if(!(tst*tst == numberOfSquares)) throw new RuntimeException("Not correct dimensions for a perfectly square board");;
+		n = numberOfSquares;
+		gridMeasurement = (int) Math.sqrt(n);
 	}
 
 
 	@Override
 	public int[] solve(int[] start, int[] goal, int maxMoves) {
-		if(start.length != size && goal.length != size) throw new RuntimeException("Board size is inconsistentg with start and goal array sizes");
+		if(start.length != n && goal.length != n) throw new RuntimeException("Board size is inconsistentg with start and goal array sizes");
 		this.startSpaceArray = layoutSpaces(start);
 		this.goalSpaceArray = layoutSpaces(goal);
+		BoardGraph graph = new BoardGraph(goalSpaceArray);
+		graph.fillNodeDistances(new Space(5,1,1));
+		graph.printDistanceFills();
+		
 		return start;
 	}
 	@Override
@@ -52,10 +57,11 @@ public class Board implements SlidingBlock {
 	
 	private Space[] layoutSpaces(int[] layout){
 		int spaceIndex = 0;
-		Space[] temp = new Space[this.size];
+		Space[] temp = new Space[n];
 		for(int x = 0; x < gridMeasurement; x++){
 			for(int y = 0; y < gridMeasurement; y++){
-				temp[spaceIndex] = new Space(spaceIndex, size, y, x, layout[spaceIndex]);
+				temp[spaceIndex] = new Space(spaceIndex, x, y);
+				temp[spaceIndex].setTile(layout[spaceIndex]);
 				spaceIndex++;
 			}
 		}
@@ -76,21 +82,9 @@ public class Board implements SlidingBlock {
 	}
 	
 	public int size(){
-		return this.size;
+		return n;
 	}
-	
-	public int gridSize(){
-		return this.gridMeasurement;
-	}
-	
-	/**
-	 * 
-	 * @param 
 	 
-	private boolean spaceHasTile(Space space) {
-		if(space.getTile() == 0) return false;
-		else return false;
-	}
 
 	/**
 	 * Checks if a wall exists between two given spaces.
@@ -154,12 +148,12 @@ public class Board implements SlidingBlock {
 	/**
 	 * Adds a given wall to the board (assumes valid)
 	 * @param wall the wall that is to be added to the list
-	 
+	 */
 	public void addWall(Wall wall) {
 		wallList.add(wall);
-		graph.addWall(wall);
-		currentPlayer.decrementWallTally();
-	}*/
+		graph = new BoardGraph(this.getSpaceArray());
+			addWall(wall);
+	}
 
 	/**
 	 * Returns a String representation of the board's current state
