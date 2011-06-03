@@ -93,9 +93,6 @@ public class Space extends BoardComponent {
         return new Space(this.number() + 1, this.ROW, this.COL + 1);
     }
     
-   
-     
-
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */

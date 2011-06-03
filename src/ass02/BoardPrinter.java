@@ -57,10 +57,11 @@ public class BoardPrinter {
 		
 		// Fill array with wall locations
 		for (Wall wall : board.getWallList()) {
-			row = wall.getSpace().row() - 1;
-			col = wall.getSpace().col() - 1;
-			if (wall.isVertical()) wallArray[row][col] = 1;
-			else wallArray[row][col] = 2;
+			row = wall.getSpace().row();
+			col = wall.getSpace().col();
+			if (wall.isVertical() && wallArray[row][col] == 0) wallArray[row][col] = 1;
+			else if (wall.isHorizontal() && wallArray[row][col] == 0) wallArray[row][col] = 2;
+			else if (wallArray[row][col] == 1 || wallArray[row][col] == 2) wallArray[row][col] = 3;
 		}
 		
 
@@ -78,7 +79,7 @@ public class BoardPrinter {
 				
 				i++;
 				if (col != board.gridMeasurement() - 1) {
-					if (wallArray[row][col] == 1 || row != 0 && wallArray[row-1][col] == 1) boardString.append(V_WALL);
+					if (wallArray[row][col] == 1 || wallArray[row][col] == 3) boardString.append(V_WALL);
 					else boardString.append(V_DIVIDER);
 				}
 			}
@@ -88,12 +89,11 @@ public class BoardPrinter {
 			if (row != board.gridMeasurement() - 1) {
 				boardString.append("  | ");
 				for (col = 0; col < board.gridMeasurement(); col++) {
-					if (wallArray[row][col] == 2 || col != 0 && wallArray[row][col-1] == 2) boardString.append(H_WALL + H_WALL + H_WALL);
+					if (wallArray[row][col] == 2 || wallArray[row][col] == 3) boardString.append(H_WALL+H_WALL);
 					else boardString.append(hDivider);
 					
 					if (col != board.gridMeasurement() - 1) {
-						if (wallArray[row][col] == 1) boardString.append(V_WALL);
-						else if (wallArray[row][col] == 2) boardString.append(H_WALL);
+						if (wallArray[row][col] == 2 || wallArray[row][col] == 3) boardString.append(H_WALL+"  ");
 						else boardString.append(corner);
 					}
 				}

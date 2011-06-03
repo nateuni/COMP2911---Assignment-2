@@ -102,7 +102,7 @@ public class BoardGraph extends BoardComponent {
 	 * Checks whether the search so far has found a shorter path to a node
 	 * than a previously found path.
 	 * @param thisNode The node to be checked.
-	 * @param distance The distance travelled in the new path.
+	 * @param distance The distance traveled in the new path.
 	 * @return The node if a new path was found, otherwise null
 	 */
 	private Node tryNode(Node thisNode, int distance) {
@@ -118,6 +118,7 @@ public class BoardGraph extends BoardComponent {
 	 * Only used for testing.
 	 */
 	public void printDistanceFills() {
+		System.out.println("BoardGraph Distance Fills:\n");
 		int row, col;
 		for (row = 0; row < gridMeasurement; row++) {
 			System.out.print(" ");

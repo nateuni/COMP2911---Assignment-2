@@ -1,71 +1,48 @@
 package ass02;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.LinkedList;
 
 /**
  * A board has Two Players and up to 20 placed walls (10 per player) and tracks each of their coordinates.
  * @author Team Stump
  */
-public class Board extends BoardComponent implements SlidingBlock {
+public class Board extends BoardComponent{
 
 	final boolean VERTICAL = true;
 	final boolean HORIZONTAL = false;
 	protected LinkedList<Wall> wallList = new LinkedList<Wall>();
-	//protected LinkedList<Move> moveList = new LinkedList<Move>();
 	protected int moveListIndex = -1;
 	public BoardGraph graph;
-	
-	//private final int size;
-	//private final int gridMeasurement;
-	//private Space start;
-	//private Space goal;
-	//private int maxMoves;
 	private Space[] boardSpaceArray;
 	
 	
 	public Board(int numberOfSquares){
-		if(numberOfSquares < 4) throw new RuntimeException("Minimum of 4 spaces on a board");
-		// How to test for perfect square?
-		long check = (long)(Math.sqrt(numberOfSquares) + 0.5);
-		if(!(check*check == numberOfSquares)) throw new RuntimeException("Not correct dimensions for a perfectly square board");;
 		n = numberOfSquares;
 		gridMeasurement = (int) Math.sqrt(n);
 	}
-
-
-	@Override
-	public int[] solve(int[] start, int[] goal, int maxMoves) {
-		if(start.length != n && goal.length != n) throw new RuntimeException("Board size is inconsistentg with start and goal array sizes");
-		this.boardSpaceArray = layoutSpaces(start);
-		BoardGraph graph = new BoardGraph(boardSpaceArray);
-		graph.fillNodeDistances(new Space(5,1,1));
-		graph.printDistanceFills();
-		
-		return start;
+	
+	/**
+	 * Returns a pointer to the wall list.
+	 * @return The list of all walls at time of calling
+	 */
+	public LinkedList<Wall> getWallList() {
+		return this.wallList;
 	}
-	@Override
-	public int[] shortestPath(int startPosition) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	@Override
-	public void addWall(int positionI, int positionJ) {
-		Space spaceI = findCorrespondingBoardSpace(positionI);
-		Space spaceJ = findCorrespondingBoardSpace(positionJ);	
+	
+	public void addWallToBoard(Space spaceI, Space spaceJ) {
 		Wall wall = null;
-		
-		if(spaceI == null && spaceJ == null){
-			System.out.println("Cannot Add Wall with Null Spaces");
+		if(spaceI == null || spaceJ == null){
+			throw new NullPointerException("Cannot Add Wall with Null Spaces");
 		} else{
 			if(spaceI.isAdjacent(spaceJ)){
-				if(spaceI == spaceJ.getUp()){
+				if(spaceI.equals(spaceJ.getUp())){
 					wall = new Wall(spaceI, HORIZONTAL);
-				} else if(spaceI == spaceJ.getDown()){
+				} else if(spaceI.equals(spaceJ.getDown())){
 					wall = new Wall(spaceJ,HORIZONTAL);
-				} else if(spaceI == spaceJ.getLeft()){
+				} else if(spaceI.equals(spaceJ.getLeft())){
 					wall = new Wall(spaceI,VERTICAL);
-				} else if(spaceI == spaceJ.getRight()) {
+				} else if(spaceI.equals(spaceJ.getRight())) {
 					wall = new Wall(spaceJ,VERTICAL);
 				}
 			}
@@ -80,14 +57,6 @@ public class Board extends BoardComponent implements SlidingBlock {
 		}
 	}
 	
-	/**
-	 * Returns a pointer to the wall list.
-	 * @return The list of all walls at time of calling
-	 */
-	public LinkedList<Wall> getWallList() {
-		return this.wallList;
-	}
-	
 	public Space findCorrespondingBoardSpace(int position){
 		boolean found = false;
 		Space space = null;
@@ -100,7 +69,7 @@ public class Board extends BoardComponent implements SlidingBlock {
 		return space;
 	}
 	
-	private Space[] layoutSpaces(int[] layout){
+	protected Space[] layoutSpaces(int[] layout){
 		int spaceIndex = 0;
 		Space[] temp = new Space[n];
 		for(int x = 0; x < gridMeasurement; x++){
@@ -117,6 +86,19 @@ public class Board extends BoardComponent implements SlidingBlock {
 		return this.boardSpaceArray;
 	}
 	
+	public void setBoardSpaceArray(Space[] boardSpaceArray) {
+		this.boardSpaceArray = boardSpaceArray;
+		graph = new BoardGraph(this.getBoardSpaceArray());
+	}
+
+	public BoardGraph getGraph() {
+		return graph;
+	}
+
+	public void setupBoardGraph(Space[] spaceArray) {
+		this.graph = Factory.makeBoardGraph(spaceArray);
+	}
+
 	/**
 	 * Tests if game has been won.
 	 * @return 1 is game is won by player 1, 2 if won by player 2, 0 otherwise
@@ -128,6 +110,19 @@ public class Board extends BoardComponent implements SlidingBlock {
 	
 	public int size(){
 		return n;
+	}
+	
+	public boolean swapTiles(int a, int b){
+		Space spaceA = null, spaceB = null;;
+		for(int i = 0; i < this.getBoardSpaceArray().length; i++){
+			if(this.boardSpaceArray[i].getTile().number() == a){
+				spaceA = this.boardSpaceArray[i];
+			} else if(this.boardSpaceArray[i].getTile().number() == b){
+				spaceB = this.boardSpaceArray[i];
+			}
+		}
+		assert(spaceA != null && spaceB != null);
+		return(spaceA.swopTiles(spaceB));
 	}
 	 
 
@@ -196,7 +191,7 @@ public class Board extends BoardComponent implements SlidingBlock {
 	 */
 	public void placeWall(Wall wall) {
 		wallList.add(wall);
-		graph = new BoardGraph(this.getBoardSpaceArray());
+		graph.addWall(wall);
 	}
 
 	/**
