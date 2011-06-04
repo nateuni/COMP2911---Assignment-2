@@ -48,15 +48,16 @@ public class BoardGraph extends BoardComponent {
 		assert(row >= 0 && row < n && col >= 0 && col < n);
 		if (wall.isVertical()) {
 			node[row][col].right = null;
-			node[row+1][col].right = null;
 			node[row][col+1].left = null;
-			node[row+1][col+1].left = null;
 		}
-		else {
+		else if (!wall.isVertical())  {
 			node[row][col].down = null;
-			node[row][col+1].down = null;
 			node[row+1][col].up = null;
-			node[row+1][col+1].up = null;
+		} else{
+			node[row][col].right = null;
+			node[row][col+1].left = null;
+			node[row][col].down = null;
+			node[row+1][col].up = null;
 		}
 	}
 
